@@ -38,6 +38,8 @@ from models import ConferenceQueryForms
 from models import Session
 from models import SessionForm
 from models import SessionForms
+from models import Speaker
+from models import SpeakerForm
 from models import BooleanMessage
 from models import ConflictException
 from models import StringMessage
@@ -554,6 +556,79 @@ class ConferenceApi(remote.Service):
         """Update & return user profile."""
         return self._doProfile(request)
 
+
+# - - - Speaker objects - - - - - - - - - - - - - - - - - - -
+
+
+    def _copySpeakerToForm(self, speak):
+        """Copy relevant fields from Speaker to SpeakerForm."""
+        spf = SpeakerForm()
+        for field in spf.all_fields():
+            if hasattr(speak, field.name):
+                setattr(spf, field.name, getattr(speak, field.name))
+            elif field.name == "websafeKey":
+                setattr(sf, field.name, sess.key.urlsafe())
+        spf.check_initialized()
+        return spf
+
+
+    def _createSpeakerObject(self, request):
+        """Create or update Speaker object, returning SpeakerForms."""
+        # preload necessary data items
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+        user_id = getUserId(user)
+
+        # confirm required fields
+        if not request.displayName:
+            raise endpoints.BadRequestException("Spearker 'displayName' field required")
+
+        # copy SessionForm/ProtoRPC Message into dict
+        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+
+        # make Profile Key from user ID
+        p_key = ndb.Key(Profile, user_id)
+        # allocate new Session ID with User key as parent
+        s_id = Speaker.allocate_ids(size=1, parent=p_key)[0]
+        # make Awaaion key from ID
+        sp_key = ndb.Key(Speaker, s_id, parent=p_key)
+        data['key'] = sp_key
+
+        # create Conference, send email to organizer confirming
+        # creation of Conference & return (modified) ConferenceForm
+        Speaker(**data).put()
+        spk = sp_key.get()
+
+        return self._copySpeakerToForm(speak=spk)
+
+    """
+    @endpoints.method(CONF_GET_REQUEST, SessionForms,
+            path='conference/{websafeConferenceKey}/session',
+            http_method='GET', name='getConferenceSessions')
+    def getConferenceSessions(self, request):
+        Get list of sessions for a given conference.
+        # get Conference object from request; bail if not found
+        c_key = ndb.Key(urlsafe=request.websafeConferenceKey)
+        if not c_key:
+            raise endpoints.NotFoundException(
+                'No conference found with key: %s' % request.websafeConferenceKey)
+        # Query for keys of all sessions with the Conference as ancestor
+        sessions = Session.query(ancestor=c_key).fetch()
+
+        # return set of SessionForm objects per Session
+        return SessionForms(items=[self._copySessionToForm(s, "")\
+            for s in sessions]
+            )
+    """
+        
+    @endpoints.method(
+            SpeakerForm, SpeakerForm, 
+            path='speaker',
+            http_method='POST', name='createSpeaker')
+    def createSpeaker(self, request):
+        """Create new session."""
+        return self._createSpeakerObject(request)
 
 # - - - Registration - - - - - - - - - - - - - - - - - - - -
 
