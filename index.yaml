@@ -19,3 +19,15 @@ indexes:
   properties:
   - name: seatsAvailable
   - name: name
+
+- kind: Session
+  properties:
+  - name: conferenceId
+  - name: speaker
+  - name: startTime
+
+- kind: Session
+  properties:
+  - name: conferenceId
+  - name: typeOfSession
+  - name: startTime
