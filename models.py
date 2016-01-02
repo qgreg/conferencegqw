@@ -115,6 +115,7 @@ class Session(ndb.Model):
     typeOfSession   = ndb.StringProperty()
     duration        = ndb.IntegerProperty()
     date            = ndb.DateProperty()
+    startTime       = ndb.TimeProperty()
     conferenceId    = ndb.StringProperty()
 
 
@@ -135,9 +136,10 @@ class SessionForm(messages.Message):
     typeOfSession   = messages.StringField(4)
     duration        = messages.IntegerField(5)
     date            = messages.StringField(6)
-    conferenceId    = messages.StringField(7)
-    websafeKey      = messages.StringField(8)
-    conferenceName  = messages.StringField(9)
+    startTime       = messages.StringField(7)
+    conferenceId    = messages.StringField(8)
+    websafeKey      = messages.StringField(9)
+    conferenceName  = messages.StringField(10)
 
 
 class SessionForms(messages.Message):
