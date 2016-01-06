@@ -48,7 +48,7 @@ Using the websafe conference key and a date in the format mmddyyyy, users can qu
 Get Speaker by City
 If the user provides the name of the city, the app will return the speakers appearing in conferences occuring in that city. The city must be found in conferences in the app.
 
-Problem Query
+## Problem Query
 "Let’s say that you don't like workshops and you don't like sessions after 7 pm. How would you handle a query for all non-workshop sessions before 7 pm? What is the problem for implementing this query? What ways to solve it did you think of?"
 
 This query is implemented as getSessionsNotTypeBeforeHour at path:
