@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+import webapp2
+from google.appengine.api import app_identity
+from google.appengine.api import mail
+from conference import ConferenceApi
+
 """
 main.py -- Udacity conference server-side Python App Engine
     HTTP controller handlers for memcache & task queue access
@@ -12,15 +17,19 @@ created by wesc on 2014 may 24
 
 __author__ = 'wesc+api@google.com (Wesley Chun)'
 
-import webapp2
-from google.appengine.api import app_identity
-from google.appengine.api import mail
-from conference import ConferenceApi
 
 class SetAnnouncementHandler(webapp2.RequestHandler):
     def get(self):
         """Set Announcement in Memcache."""
         ConferenceApi._cacheAnnouncement()
+        self.response.set_status(204)
+
+
+class SetFeaturedSpeakerHandler(webapp2.RequestHandler):
+    def post(self):
+        """Set Featured Speaker."""
+        websafeSessionKey = self.request.get('websafeSessionKey')
+        ConferenceApi._setFeaturedSpeaker(websafeSessionKey)
         self.response.set_status(204)
 
 
@@ -41,4 +50,5 @@ class SendConfirmationEmailHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/crons/set_announcement', SetAnnouncementHandler),
     ('/tasks/send_confirmation_email', SendConfirmationEmailHandler),
+    ('/tasks/set_featured_speaker', SetFeaturedSpeakerHandler)
 ], debug=True)
