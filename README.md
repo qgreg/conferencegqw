@@ -68,36 +68,32 @@ Problem Query
 
 The apps paths, methods and functions are summarized below:
 
-PATH        							HTTP    Function
-conference 								POST	createConference
-conference/{websafeConferenceKey}		PUT    	updateConference
-conference/{websafeConferenceKey}		GET    	getConference
-getConferencesCreated					POST	getConferencesCreated
-queryConferences						POST	queryConferences
-conference/{websafeConferenceKey}/session	
-										GET 	getConferenceSessions
-conference/{websafeConferenceKey}/session	
-										POST 	createSession
-conference/{websafeConferenceKey}/session/type/{typeOfSession}	
-										GET 	getConferenceSessionsByType
-conference/session/{websafeSessionKey}	POST 	addSessionToWishlist
-conference/session/{websafeSessionKey}	DELETE 	deleteSessionInWishlist
-session 								GET 	getSessionsInWishlist
-speaker/{websafeSpeakerKey}/session 	GET 	getSessionsBySpeaker
-conference/{websafeConferenceKey}/session/nottype/{nottype}/before/{hour}
-										GET		getSessionsNotTypeBeforeHour
-conference/{websafeConferenceKey}/session/date/{sessdate}
-										GET 	getSessionsByDate
-profile 								GET 	getProfile
-profile									POST	saveProfile
-speaker									POST	createSpeaker
-speaker/city/{city}/get 				GET 	getSpeakerByCity
-conference/announcement/get				GET 	getAnnouncement
-conference/featuredspeaker/get			GET 	getFeaturedSpeaker
-conferences/attending					GET 	getConferencesToAttend
-conference/{websafeConferenceKey}		POST	registerForConference
-conference/{websafeConferenceKey}		DELETE 	unregisterFromConference
-filterPlayground						GET 	filterPlayground
+PATH | HTTP | Function
+---- | ---- | --------
+conference | POS | createConference
+conference/{websafeConferenceKey} | PUT | updateConference
+conference/{websafeConferenceKey} | GET | getConference
+getConferencesCreated | POST	getConferencesCreated
+queryConferences | POST	queryConferences
+conference/{websafeConferenceKey}/session | GET | etConferenceSessions
+conference/{websafeConferenceKey}/session | POST | createSession
+conference/{websafeConferenceKey}/session/type/{typeOfSession} | GET | getConferenceSessionsByType
+conference/session/{websafeSessionKey} | POST | addSessionToWishlist
+conference/session/{websafeSessionKey} | DELETE | deleteSessionInWishlist
+session | GET | getSessionsInWishlist
+speaker/{websafeSpeakerKey}/session | GET | getSessionsBySpeaker
+conference/{websafeConferenceKey}/session/nottype/{nottype}/before/{hour} | GET | getSessionsNotTypeBeforeHour
+conference/{websafeConferenceKey}/session/date/{sessdate} | GET | getSessionsByDate
+profile | GET | getProfile
+profile | POST | saveProfile
+speaker | POST | createSpeaker
+speaker/city/{city}/get | GET | getSpeakerByCity
+conference/announcement/get | GET | getAnnouncement
+conference/featuredspeaker/get | GET | getFeaturedSpeaker
+conferences/attending | GET | getConferencesToAttend
+conference/{websafeConferenceKey} | POST | registerForConference
+conference/{websafeConferenceKey} | DELETE | unregisterFromConference
+filterPlayground | GET | filterPlayground
 
 Design Notes
 
