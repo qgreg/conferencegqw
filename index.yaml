@@ -31,3 +31,9 @@ indexes:
   - name: conferenceId
   - name: typeOfSession
   - name: startTime
+
+- kind: Session
+  properties:
+  - name: conferenceKey
+  - name: typeOfSession
+  - name: startTime
