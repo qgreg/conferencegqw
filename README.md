@@ -29,16 +29,38 @@ Sessions can be created for a given conference as a child of the conference. The
 
 Sessions can only be created by the creator of the conference. The name of the session is required to create the session. 
 
-If the speaker is provided, the speaker must be present in the Speaker class. Only one speaker is currently permitted. Future improvements might allow for multiple registered speakers for a given session.
+If the speaker is provided, the speaker must be present in the Speaker class. The app accepts the displayName for the speaker as input, but then then looks up the displayName to validate that the speaker exists, then stores the key for the named speaker. 
+
+Only one speaker is currently permitted. Future improvements might allow for multiple registered speakers for a given session.
 
 startTime is in 24 hour time to allow for sorting of times.
 
 Users may add or remove a session from the user's wishlist. The user need not be registered for the conference to add the session to the wishlist.
 
+Properties:
+name is a required string for the session name.
+highlights is a string that briefly describes the session.
+typeOfSession is a string that describes the session type.
+duration is an integer used to detail the duration of the session in minutes.
+date is the required date of the session.
+startTime is the required time, to be entered in 24 hour format, of the start time of the session.
+speakerKey is a key of the speaker for the session.
+ConferenceKey is the computed key for the session's parent conference. This allows the parent to be used in a filter.  
+
+The conference and the user are the Session's ancestor. 
+
 ## Speakers
 Speakers can be created by users independent of conferences or sessions, but the speaker is connected to the profile of the user that created the speaker. The speaker class tracks the name, bio and email of the speaker.
 
-Speakers must be added to the app before they can be added to a session.
+Speakers must be added to the app before they can be added to a session. T
+
+Properties:
+displayName is a required string of the name of the speaker.
+mainEmail is a string of the speaker's email
+bio is a string describing the speaker's biography.
+
+The creator userID is the Speaker's ancestor.
+
 
 ## Two Additional Queries
 
@@ -51,18 +73,25 @@ If the user provides the name of the city, the app will return the speakers appe
 ## Problem Query
 "Let’s say that you don't like workshops and you don't like sessions after 7 pm. How would you handle a query for all non-workshop sessions before 7 pm? What is the problem for implementing this query? What ways to solve it did you think of?"
 
+The challenge of this problem is to avoid a query involving inequity expressions in two different properties, which cannot be accomplished in the Datastore. We can solve the problem by avoiding an inequity expression in the typeOfSession property. Instead, we make a list of typeOfSession using a seperate query that excludes the given type. This excluded list can use IN method to include the remaining typeOfSession in conjunction with the less than inequity that will be used in filtering the start time.
+
 This query is implemented as getSessionsNotTypeBeforeHour at path:
 
 conference/{websafeConferenceKey}/session/nottype/{nottype}/before/{hour}
 
-where nottype is a valid typeOfSession and hour is a number between 1 and 23 representing the hour the user wants to find sessions occuring before.
+where websafeConferenceKey represents a valid conference websafe key, nottype is a valid typeOfSession and hour is a number between 1 and 23 representing the hour the user wants to find sessions occuring before.
 
 The logic of the query is that the function:
-	1. creates a list  of typeOfSessions that excludes the given type
-	2. finds the sessions that match this exclusive list
-	3. limits these sessions to ones that are in the given conference
-	4. finally, limits the sessions to those that occur before the given hour
-Steps 1-2, finding the sessions that do not equal the given session type, avoid using an inequity to do so. Instead, we can use the IN method to accomplish this exclusion. That allows step 4, finding sessions that occur before the given hour, to be the only in equity in this query.
+   1. confirm that the websafe Conference key is valid
+	2. creates a list of typeOfSessions for all typeOfSessions that are not the given value
+	3. finds the sessions that match this exclusive list
+	4. limits these sessions to ones that are in the given conference
+	5. finally, limits the sessions to those that occur before the given hour. Time is a required field for a session.
+Steps 2-3, finding the sessions that do not equal the given session type, avoid using an inequity to do so. Instead, we can use the IN method to accomplish this exclusion. That allows step 5, finding sessions that occur before the given hour, to be the only in equity in this query.
+
+To allow this query, Session has a computed field of conferenceKey. Ndb will not allow either ancestor=key or the IN method to be in a filter. The introduced computer field works around this limitation by creating a filter that allows us to limit the query results to a key of the parent.
+
+Future features could allow enumerate the valid typeOfSession values, restricting the possible typeOfSession. However, the logic still works to limit typeOfSessions when the user's data entry uses consistant and repeated typeOfSession values. For example, if the user has entered "Workshop" values considtently, providing the value "Workshop" in the endpoint url will exlude this value of typeOfSession. Allowing the conference owner to enter data consistently without coded validation provides flexibility in naming to the user, and elimates the need for a coder to make changes. This design choice trades off flexibilty for data validation.  
 
 ## Paths, Methods, and Functions
 
@@ -75,12 +104,12 @@ conference/{websafeConferenceKey} | PUT | updateConference
 conference/{websafeConferenceKey} | GET | getConference
 getConferencesCreated | POST	getConferencesCreated
 queryConferences | POST	queryConferences
-conference/{websafeConferenceKey}/session | GET | etConferenceSessions
+conference/{websafeConferenceKey}/session | GET | getConferenceSessions
 conference/{websafeConferenceKey}/session | POST | createSession
 conference/{websafeConferenceKey}/session/type/{typeOfSession} | GET | getConferenceSessionsByType
-conference/session/{websafeSessionKey} | POST | addSessionToWishlist
-conference/session/{websafeSessionKey} | DELETE | deleteSessionInWishlist
-session | GET | getSessionsInWishlist
+profile/wishlist/{websafeSessionKey} | POST | addSessionToWishlist
+profile/wishlist/{websafeSessionKey} | DELETE | deleteSessionInWishlist
+profile/wishlist | GET | getSessionsInWishlist
 speaker/{websafeSpeakerKey}/session | GET | getSessionsBySpeaker
 conference/{websafeConferenceKey}/session/nottype/{nottype}/before/{hour} | GET | getSessionsNotTypeBeforeHour
 conference/{websafeConferenceKey}/session/date/{sessdate} | GET | getSessionsByDate
