@@ -47,15 +47,16 @@ startTime is the required time, to be entered in 24 hour format, of the start ti
 speakerKey is a key of the speaker for the session.
 ConferenceKey is the computed key for the session's parent conference. This allows the parent to be used in a filter.  
 
-The conference and the user are the Session's ancestor. 
+The conference and the user are the Session's ancestor.
+
 
 ## Speakers
 Speakers can be created by users independent of conferences or sessions, but the speaker is connected to the profile of the user that created the speaker. The speaker class tracks the name, bio and email of the speaker.
 
-Speakers must be added to the app before they can be added to a session. T
+Speakers must be added to the app before they can be added to a session, but are not required to create a session.
 
 Properties:
-displayName is a required string of the name of the speaker.
+displayName is a required string of the name of the speaker, and must be unique for the parent user.
 mainEmail is a string of the speaker's email
 bio is a string describing the speaker's biography.
 
